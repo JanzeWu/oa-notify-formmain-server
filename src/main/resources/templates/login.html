@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>OA请假通知订阅</title>
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
+
+    <script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.js"></script>
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+
+    <style>
+        body {
+            margin-top: 150px;
+        }
+    </style>
+</head>
+<body>
+
+
+<div class="container-fluid">
+    <div class="row">
+
+
+        <div class="col-md-6 col-md-offset-3">
+            <h1 class="text-center">OA请假通知订阅</h1>
+        </div>
+        <div class="col-md-6 col-md-offset-3">
+            <form class="form-horizontal" action="/login" method="POST">
+                <div class="form-group">
+                    <label for="inputEmail3" class="col-sm-2 control-label">Username</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="inputEmail3" name="username" placeholder="Username">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="inputPassword3" class="col-sm-2 control-label">Password</label>
+                    <div class="col-sm-10">
+                        <input type="password" class="form-control" id="inputPassword3" name="password"
+                               placeholder="Password">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <span class="col-md-6 col-md-offset-3" th:if="${param.error}">
+                            Invalid username and password.
+                        </span>
+                    <span class="col-md-6 col-md-offset-3" th:if="${param.logout}">
+                            You have been logged out.
+                        </span>
+
+                    <div class="col-sm-offset-10 col-sm-2">
+                        <button type="submit" class="btn btn-block btn-info" name="submit" value="Sign In">Sign in
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

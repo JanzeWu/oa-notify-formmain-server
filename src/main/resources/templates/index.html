@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>OA请假通知订阅</title>
+        <link href="https://cdn.bootcss.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
+
+
+        <style type="text/css">
+
+            body {
+                margin: 0 auto;
+            }
+
+            .show {
+                margin: 10px auto;
+                width: 950px;
+                font-size: 14px;
+            }
+
+            .form-header {
+                margin-bottom: 20px;
+            }
+
+            .layer {
+                margin-top: 80px;
+            }
+
+            .content {
+                float: left;
+                width: 950px;
+                margin: 10px 0px 20px 10px;
+            }
+
+            .bigfont {
+                font-size: 14px;
+            }
+
+            .la {
+                float: left;
+                width: 100px;
+                height: 20px;
+                margin: 5px 0;
+                line-height: 20px;
+            }
+
+            .la input {
+                float: left;
+            }
+
+            .la span {
+                float: left;
+                line-height: 20px;
+            }
+            .subscribed_count {
+                float: right;
+                margin-right: 100px;
+            }
+
+        </style>
+
+        <script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.js"></script>
+        <script src="https://cdn.bootcss.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+
+
+    </head>
+
+    <body>
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-offset-10 col-sm-2">
+                    <form action="/logout" method="post">
+                        <input type="submit" class="btn btn-info" value="退出"/>
+                    </form>
+                </div>
+            </div>
+            <div class="layer" id="layer">
+                <form action="/subscribe" , method="get" class="form-horizontal">
+                    <div class="show form-header" id="form_content">
+                        <!--<span class="bigfont">全选</span><input type="checkbox" id="all_check" name="all_check"/>-->
+                        <button type="submit" class="btn btn-info">确认订阅成员列表</button>
+
+
+                    </div>
+                    <div class="show" id="show"></div>
+                    <input type="hidden" name="link" value="-1"/>
+                </form>
+            </div>
+        </div>
+
+        <script type="text/javascript">
+
+            window.onload = function httpGet() {
+                var xmlHttp = new XMLHttpRequest();
+                xmlHttp.open("GET", "/oa/members", false); // false for synchronous request
+                xmlHttp.send(null);
+                var members = JSON.parse(xmlHttp.responseText);
+                var departments = []
+                for (var i = 0; i < members.length; i++) {
+                    departments.push(members[i].department)
+                }
+                genCheck(departments, members);
+            }
+
+            function chaCloor(field){
+                field.parentNode.style.backgroundColor= field.checked ? "#FEFF08" : "";
+            }
+
+            function genCheck(departments, members) {
+                var content = "content";
+                var checkText = "checkbox";
+
+                $("#show").html("");
+
+
+                for (var i = 0; i < departments.length; i++) {
+                    genShowContent("show", checkText + i, i, departments[i], content + i);
+                }
+
+                var subscribedCount = 0;
+                for (var i = 0; i < members.length; i++) {
+                    var array = members[i].members
+                    for (var j = 0; j < array.length; j++) {
+                        if (array[j].subscribed)
+                            subscribedCount++;
+                        genCheckBox(content + i, array[j].id, array[j].name, i, array[j].subscribed ? true : false);
+                    }
+                }
+
+//                // 全选框为true，全部员工选上
+//                $("#all_check").unbind();
+//                $("#all_check").change(function () {
+//                    var allCheck = document.getElementById("all_check");
+//                    var allMembers = document.getElementsByName("link");
+//                    if (allCheck.checked) {
+//                        for (var i = 0; i < allMembers.length; i++) {
+//                            allMembers[i].checked = true;
+//                        }
+//                    } else {
+//                        for (var i = 0; i < allMembers.length; i++) {
+//                            allMembers[i].checked = false;
+//                        }
+//                    }
+//                });
+//
+//                // 绑定每个员工，如果全部选上，全选框为true
+//                $("input[name='link']").each(function () {
+//                    $(this).unbind();
+//                    $(this).change(function () {
+//                        var allCheckBox = document.getElementById("all_check");
+//                        if (isAllCheck("link")) {
+//                            allCheckBox.checked = true;
+//                        } else {
+//                            allCheckBox.checked = false;
+//                        }
+//                    })
+//                });
+//
+//                // 初始化全选框，如果全部选上，全选框为true，否则为false
+//                if (isAllCheck("link")) {
+//                    document.getElementById("all_check").checked = true;
+//                } else {
+//                    document.getElementById("all_check").checked = false;
+//                }
+
+                // 组全选
+                var departmentSize = departments.length;
+                for (var groupId = 0; groupId < departmentSize; groupId++){
+
+                    var box = document.getElementsByClassName("dm" + groupId);
+                    for (var i = 0; i < box.length; i++){
+                        box[i].parentNode.style.backgroundColor= box[i].checked ? "#FEFF08" : "";
+                    }
+
+
+                    $("#" + checkText + groupId).unbind();
+                    $("#" + checkText + groupId).change(function () {
+                        var p = document.getElementById(checkText + $(this).attr("index"));
+
+                        var box = document.getElementsByClassName("dm" + $(this).attr("index"))
+                        for (var j = 0; j < box.length; j++) {
+                            if (p.checked) {
+                                box[j].checked = true;
+                                box[j].parentNode.style.backgroundColor="#FEFF08";
+                            } else {
+                                box[j].checked = false;
+                                box[j].parentNode.style.backgroundColor="";
+                            }
+                        }
+                    });
+
+
+                    $(".dm" + groupId).unbind();
+                    $(".dm" + groupId).each(function () {
+                        $(this).change(function () {
+                            var flag = isAllCheckByClassName($(this).attr("class"));
+                            var box = document.getElementById(checkText + $(this).attr("parentIndex"));
+                            if (flag) {
+                                box.checked = true;
+                            } else {
+                                box.checked = false;
+                            }
+
+                        })
+                    })
+
+                    if( isAllCheckByClassName("dm" + groupId) ){
+                        document.getElementById(checkText + groupId).checked = true;
+                    }else{
+                        document.getElementById(checkText + groupId).checked = false;
+                    }
+
+
+
+                }
+
+
+
+
+                $("#form_content").append("<span class='bigfont subscribed_count'>已经订阅" + subscribedCount+ "人。</span>")
+
+            }
+
+
+            function genCheckBox(id, value, showText, parentIndex, isCheck) {
+                if (!isCheck) {
+                    var checkbox = "<div class='la'><input class='dm" + parentIndex + "' type='checkbox' onclick='chaCloor(this)'  parentIndex=" + parentIndex + " name='link'".concat(" value=").concat(value).concat(" alt=").concat(showText).concat(" /><span>").concat(showText).concat("</span></div>");
+                    $("#" + id).append(checkbox);
+                } else {
+                    var checkbox = "<div class='la'><input class='dm" + parentIndex + "' type='checkbox' onclick='chaCloor(this)'  parentIndex=" + parentIndex + " name='link'".concat(" checked='checked' value=").concat(value).concat(" alt=").concat(showText).concat(" /><span>").concat(showText).concat("</span></div>");
+                    $("#" + id).append(checkbox);
+                }
+            }
+
+
+            function genShowContent(id, checkboxId, index, showText, idName) {
+//                var showContent = "<div class='msg'><span class='bigfont'>".concat(showText)
+//                    .concat("： </span>")
+//                    .concat("<div class='content' id='")
+//                    .concat(idName).concat("' ></div></div>");
+
+                var showContent = "<div class='msg'><span class='bigfont'>".concat(showText)
+                    .concat("： </span><input type='checkbox' index=")
+                    .concat(index).concat(" id='").concat(checkboxId)
+                    .concat("'/><span class='bigfont'>组全选</span><div class='content' id='")
+                    .concat(idName).concat("' ></div></div>");
+                $("#" + id).append(showContent);
+            }
+
+
+            function isAllCheck(name) {
+                var box = document.getElementsByName(name);
+                for (var j = 0; j < box.length; j++) {
+                    if (box[j].type && box[j].type === 'checkbox' && !box[j].checked) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+
+            function isAllCheckByClassName(className) {
+                var box = document.getElementsByClassName(className);
+                for (var i = 0; i < box.length; i++){
+                    if ( !box[i].checked ){
+                        return false;
+                    }
+                }
+                return true;
+            }
+        </script>
+    </body>
+
+</html>
